@@ -18,7 +18,15 @@ from django.contrib import admin
 from django.urls import path,include
 urlpatterns = [
     path('admin/', admin.site.urls),
-    # bringing the url from \api\urls to dfehome\urls.py 
-    path("api/",include("api.urls")) #attaching urls.py of api
+
+
+    # Web Application EndPoint:
+    path("students/",include("students.urls")),
+
+    # API EndPoint:
+
+    path("api/v1/",include("api.urls")) #attaching urls.py of api
+
 ]
-# now the url will look like localhost:8000/api/
+
+  
