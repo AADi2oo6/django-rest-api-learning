@@ -14,6 +14,9 @@ from employees.models import Employee
 from rest_framework.views import APIView 
 from django.http import Http404 # does not come in class APIView
 
+# imports for Mixins
+from rest_framework import mixins , generics
+
 
 @api_view(['GET','POST'])
 def studentView(request):
@@ -62,51 +65,69 @@ def studentDetailView(request,pk):# Accepting primiry key from the url
         return Response(status=status.HTTP_204_NO_CONTENT)
  
 
-class Employees(APIView):
+# class Employees(APIView):
+#     def get(self,request):
+#         emp_data = Employee.objects.all()
+#         serializer = EmployeeSerializer(emp_data,many = True)
+#         return Response(serializer.data,status = status.HTTP_200_OK)
+#     def post(self,request):
+#         serializer = EmployeeSerializer(data = request.data)
+#         if serializer.is_valid():
+#             serializer.save()
+#             return Response(serializer.data,status = status.HTTP_201_CREATED)
+#         else:
+#             return Response(serializer.errors,status = status.HTTP_400_BAD_REQUEST)
+        
+# class EmployeeDetail(APIView):
+#         def get_object(self,pk):
+#             try:
+#                emp_data = Employee.objects.get(id=pk)
+#                return emp_data
+#             except Employee.DoesNotExist:
+#                raise Http404
+           
+#         def get(self,request,pk):
+#             emp_data = self.get_object(pk)
+#             serializer = EmployeeSerializer(emp_data)
+#             return Response(serializer.data,status = status.HTTP_200_OK)
+        
+#         def put(self,request,pk):
+#             emp_data = self.get_object(pk)
+#             serializer = EmployeeSerializer(emp_data,data = request.data)
+#             if serializer.is_valid():
+#                 serializer.save()
+#                 return Response(serializer.data,status = status.HTTP_201_CREATED)
+#             else:
+#                 return Response(serializer.errors,status = status.HTTP_400_BAD_REQUEST)
+        
+#         def delete(self,request,pk):
+#             emp_data = self.get_object(pk)
+#             emp_data.delete()
+#             return Response(status= status.HTTP_204_NO_CONTENT)
+           
+"""#   USING MIXINS # 
+"""
+class Employees(mixins.ListModelMixin,mixins.CreateModelMixin,generics.GenericAPIView):
+    # importing both list and create model mixins for using both get and post requests
+    queryset = Employee.objects.all() # important to use this for fetching the data :
+    serializer_class  = EmployeeSerializer
+    
     def get(self,request):
-        emp_data = Employee.objects.all()
-        serializer = EmployeeSerializer(emp_data,many = True)
-        return Response(serializer.data,status = status.HTTP_200_OK)
+        return self.list(request)
     def post(self,request):
-        serializer = EmployeeSerializer(data = request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data,status = status.HTTP_201_CREATED)
-        else:
-            return Response(serializer.errors,status = status.HTTP_400_BAD_REQUEST)
-        
-class EmployeeDetail(APIView):
-        def get_object(self,pk):
-            try:
-               emp_data = Employee.objects.get(id=pk)
-               return emp_data
-            except Employee.DoesNotExist:
-               raise Http404
-           
-        def get(self,request,pk):
-            emp_data = self.get_object(pk)
-            serializer = EmployeeSerializer(emp_data)
-            return Response(serializer.data,status = status.HTTP_200_OK)
-        
-        def put(self,request,pk):
-            emp_data = self.get_object(pk)
-            serializer = EmployeeSerializer(emp_data,data = request.data)
-            if serializer.is_valid():
-                serializer.save()
-                return Response(serializer.data,status = status.HTTP_201_CREATED)
-            else:
-                return Response(serializer.errors,status = status.HTTP_400_BAD_REQUEST)
-        
-        def delete(self,request,pk):
-            emp_data = self.get_object(pk)
-            emp_data.delete()
-            return Response(status= status.HTTP_204_NO_CONTENT)
-           
-        
+        return self.create(request)
 
 
+class EmployeeDetail(mixins.RetrieveModelMixin,mixins.UpdateModelMixin,mixins.DestroyModelMixin,generics.GenericAPIView):
+    queryset = Employee.objects.all() # this two lins are important for fetching and serializing
+    serializer_class = EmployeeSerializer
 
-
+    def get(self,request,pk):
+        return self.retrieve(request,pk)
+    def put(self,request,pk):
+        return self.update(request,pk)
+    def delete(self,request,pk):
+        return self.destroy(request,pk)
 
 
 
