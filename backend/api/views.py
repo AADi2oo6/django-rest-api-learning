@@ -1,4 +1,4 @@
-# from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 from django.http import JsonResponse
 
 from students.models import student 
@@ -15,7 +15,7 @@ from rest_framework.views import APIView
 from django.http import Http404 # does not come in class APIView
 
 # imports for Mixins
-from rest_framework import mixins , generics
+from rest_framework import mixins , generics, viewsets
 
 
 @api_view(['GET','POST'])
@@ -107,7 +107,7 @@ def studentDetailView(request,pk):# Accepting primiry key from the url
            
 """#   USING MIXINS # 
 """
-class Employees(mixins.ListModelMixin,mixins.CreateModelMixin,generics.GenericAPIView):
+'''class Employees(mixins.ListModelMixin,mixins.CreateModelMixin,generics.GenericAPIView):
     # importing both list and create model mixins for using both get and post requests
     queryset = Employee.objects.all() # important to use this for fetching the data :
     serializer_class  = EmployeeSerializer
@@ -127,7 +127,59 @@ class EmployeeDetail(mixins.RetrieveModelMixin,mixins.UpdateModelMixin,mixins.De
     def put(self,request,pk):
         return self.update(request,pk)
     def delete(self,request,pk):
-        return self.destroy(request,pk)
+        return self.destroy(request,pk)'''
+
+
+# Using Generics
+'''class Employees(generics.ListAPIView,generics.CreateAPIView):
+    queryset = Employee.objects.all()
+    serializer_class = EmployeeSerializer
+    
+
+class EmployeeDetail(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Employee.objects.all()
+    serializer_class = EmployeeSerializer
+    lookup_field = "pk"'''
+
+
+# Using View Sets: 
+
+#viewsets.ViewSet
+'''class EmployeeViewset(viewsets.ViewSet):
+    def list(self,request):
+        queryset = Employee.objects.all()
+        serializer = EmployeeSerializer(queryset,many = True)
+        return Response(serializer.data)
+    
+    def create(self,request):
+        serializer = EmployeeSerializer(data = request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status = status.HTTP_201_CREATED)
+        return Response(serializer.errors)
+    
+    def retrieve(self, request, pk = None):
+        employee = get_object_or_404(Employee,pk=pk)
+        serializer = EmployeeSerializer(employee)
+        return Response(serializer.data,status=status.HTTP_200_OK) 
+
+    def update(self,request, pk = None):
+        employee = get_object_or_404(Employee, pk=pk)
+        serializer = EmployeeSerializer(employee,data = request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data,status=status.HTTP_200_OK)
+        return Response(serializer.error_messages)
+    def delete(self,request,pk = None):
+        employee = get_object_or_404(Employee,pk = pk)
+        employee.delete()
+        return Response(status = status.HTTP_204_NO_CONTENT) 
+'''
+
+# 2. using viewset.ModelViewSet
+class EmployeeViewset(viewsets.ModelViewSet):
+    queryset = Employee.objects.all()
+    serializer_class = EmployeeSerializer    
 
 
 
@@ -140,12 +192,3 @@ class EmployeeDetail(mixins.RetrieveModelMixin,mixins.UpdateModelMixin,mixins.De
 
 
 
-
-
-
-def api_home(request):
-    d ={
-        "NAME": "ADITYA SHARMA",
-        "PRN" : 12415040
-    } 
-    return JsonResponse(d)
