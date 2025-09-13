@@ -18,6 +18,9 @@ from django.http import Http404 # does not come in class APIView
 from rest_framework import mixins , generics, viewsets
 
 
+from blogs.models import Blog,Comments
+from blogs.serializers import BlogSerializer,CommentSerializer
+
 @api_view(['GET','POST'])
 def studentView(request):
     if request.method == 'GET':
@@ -182,8 +185,26 @@ class EmployeeViewset(viewsets.ModelViewSet):
     serializer_class = EmployeeSerializer    
 
 
+class BlogsView(generics.ListCreateAPIView):
+    queryset = Blog.objects.all()
+    serializer_class = BlogSerializer
+
+class BlogDetailView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Blog.objects.all()
+    serializer_class = BlogSerializer
+    lookup_field = "pk"
+     
+class CommentsView(generics.ListCreateAPIView):
+    queryset = Comments.objects.all()
+    serializer_class = CommentSerializer
+
+class CommentsDetailView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Comments.objects.all()
+    serializer_class = CommentSerializer
+    lookup_field = 'pk'
 
 
+ 
 
 
 
