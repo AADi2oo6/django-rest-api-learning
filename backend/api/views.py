@@ -20,6 +20,7 @@ from rest_framework import mixins , generics, viewsets
 
 from blogs.models import Blog,Comments
 from blogs.serializers import BlogSerializer,CommentSerializer
+from .paginations import CustomPagination
 
 @api_view(['GET','POST'])
 def studentView(request):
@@ -182,7 +183,8 @@ class EmployeeDetail(generics.RetrieveUpdateDestroyAPIView):
 # 2. using viewset.ModelViewSet
 class EmployeeViewset(viewsets.ModelViewSet):
     queryset = Employee.objects.all()
-    serializer_class = EmployeeSerializer    
+    serializer_class = EmployeeSerializer   
+    pagination_class = CustomPagination 
 
 
 class BlogsView(generics.ListCreateAPIView):
@@ -204,7 +206,6 @@ class CommentsDetailView(generics.RetrieveUpdateDestroyAPIView):
     lookup_field = 'pk'
 
 
- 
 
 
 
