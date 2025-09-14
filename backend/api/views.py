@@ -13,6 +13,7 @@ from .serializers import EmployeeSerializer
 from employees.models import Employee
 from rest_framework.views import APIView 
 from django.http import Http404 # does not come in class APIView
+from .filters import EmployeeFilter
 
 # imports for Mixins
 from rest_framework import mixins , generics, viewsets
@@ -184,7 +185,9 @@ class EmployeeDetail(generics.RetrieveUpdateDestroyAPIView):
 class EmployeeViewset(viewsets.ModelViewSet):
     queryset = Employee.objects.all()
     serializer_class = EmployeeSerializer   
-    pagination_class = CustomPagination 
+    # pagination_class = CustomPagination 
+    # filterset_fields = ['position']
+    filterset_class= EmployeeFilter
 
 
 class BlogsView(generics.ListCreateAPIView):
